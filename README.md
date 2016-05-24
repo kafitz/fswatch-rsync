@@ -4,13 +4,12 @@ fswatch-rsync
 About
 -----
 
-This is a script to automatically synchronize a local project folder to a folder on a cluster server via a middle server. It watches the local folder for changes and recreates the local state on the target machine as soon as a change is detected.
+This is a script to automatically synchronize a local project folder to a folder on a remote server. It watches the local folder for changes and recreates the local state on the target machine as soon as a change is detected.
 
 **Notes:**
 
-* The script defaults to servers used at Aalto University but can be used for any similar setup.
 * The script ignores hidden files, you can customize the sync behaviour by changing the rsync call in the script file.
-* The script syncs every 3 seconds, this can be changed by setting the LATENCY variable.
+* The script syncs every second, this can be changed by setting the LATENCY variable.
 
 **Warning:**
 This script enforces the local state of the folder to the remote location, meaning if additional files are created on the remote location they will be deleted, so don't store results or any other work in subfolders on the remote location. If you need to work inside the target folder you can of course create hidden folders or files since hidden files will be ignored as mentionend above.
@@ -33,7 +32,7 @@ Setup
 Usage
 -----
 
-`fswatch-rsync.sh /local/path /targetserver/path ssh_user [middleserver] [targetserver] [target_ssh_user]` 
+`fswatch-rsync.sh /local/path /targetserver/path ssh_user [targetserver] [target_ssh_user]` 
 
 The compulsory arguments are
 
@@ -43,11 +42,11 @@ The compulsory arguments are
 
 Optionally you can specify 
 
-* `[middleserver]`: the name of the middle server (default is `james.hut.fi`)
-* `[targetserver]`: the target server (default is `triton.aalto.fi`)
+* `[targetserver]`: the target server (default is `home`)
 * `target_ssh_user`: If your username for the middle server differs from the username at the target server  you can specify this argument. Then `ssh_user` is used as user for the middle server and `target_ssh_user` for the target server. 
 
 **Note:** If the names of the local and remote folder are the same rsync will create a folder with the same name inside the remote folder. In that case just leave out the name in of the remote folder in the target path
+
 
 Contact and Contribution
 ------------------------
@@ -55,5 +54,3 @@ Contact and Contribution
 Clemens Westrup
 
 Please let me know if there's any problems with this script or the setup, I'm happy about any feedback. And of course also feel free to fork this and contribute here on GitHub. The package is free to use without any license (public domain).
-
-Email: firstname.lastname@aalto.fi
