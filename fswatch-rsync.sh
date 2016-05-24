@@ -21,11 +21,10 @@ VERSION="0.2.0"
 FSWATCH_PATH="fswatch"
 
 # Sync latency / speed in seconds
-LATENCY="3"
+LATENCY="1"
 
 # default server setup
-MIDDLE="brute.aalto.fi" # middle ssh server
-TARGET="login2.triton.aalto.fi" # target ssh server
+TARGET="home" # target ssh server
 
 # check color support
 colors=$(tput colors)
@@ -43,7 +42,7 @@ fi
 if [[ "$1" = "" || "$2" = "" || "$3" = "" ]]; then
   echo -e "${red}Error: $PROJECT takes 3 compulsory arguments.${nocolor}"
   echo -n "Usage: fswatch-rsync.sh /local/path /targetserver/path ssh_user "
-  echo    "[middleserver] [targetserver] [target_ssh_user]"
+  echo    "[targetserver] [target_ssh_user]"
   exit
 else
   LOCAL_PATH="$1"
@@ -53,13 +52,10 @@ fi
 
 # Check optional arguments
 if [[ "$4" != "" ]]; then
-  MIDDLE="$4"
+  TARGET="$4"
 fi
 if [[ "$5" != "" ]]; then
-  TARGET="$5"
-fi
-if [[ "$6" != "" ]]; then
-  TARGET_SSH_USER="$6"
+  TARGET_SSH_USER="$5"
 else
   TARGET_SSH_USER="$SSH_USER"
 fi
@@ -69,7 +65,6 @@ echo      ""
 echo -e   "${green}Hei! This is $PROJECT v$VERSION.${nocolor}"
 echo      "Local source path:  \"$LOCAL_PATH\""
 echo      "Remote target path: \"$TARGET_PATH\""
-echo      "Via middle server:  \"$SSH_USER@$MIDDLE\""
 echo      "To target server:   \"$TARGET_SSH_USER@$TARGET\""
 echo      ""
 echo -n   "Performing initial complete synchronization "
@@ -80,8 +75,8 @@ echo      "with local version if differences occur)."
 read -n1 -r -p "Press any key to continue (or abort with Ctrl-C)... " key
 echo      ""
 echo -n   "Synchronizing... "
-rsync -avzr -q --delete --force --exclude=".*" \
--e "ssh $SSH_USER@$MIDDLE ssh" $LOCAL_PATH $TARGET_SSH_USER@$TARGET:$TARGET_PATH
+echo rsync -avzr -q --delete --force --exclude=".*" $LOCAL_PATH $TARGET_SSH_USER@$TARGET:$TARGET_PATH
+rsync -avzr -q --delete --force --exclude=".*" $LOCAL_PATH $TARGET_SSH_USER@$TARGET:$TARGET_PATH
 echo      "done."
 echo      ""
 
@@ -94,7 +89,6 @@ ${FSWATCH_PATH} -0 -r -l $LATENCY $LOCAL_PATH --exclude="/\.[^/]*$" \
     echo -en "${green}" `date` "${nocolor}\"$event\" changed. Synchronizing... "
     rsync -avzr -q --delete --force \
     --include-from=.tmp_files \
-    -e "ssh $SSH_USER@$MIDDLE ssh" \
     $LOCAL_PATH $TARGET_SSH_USER@$TARGET:$TARGET_PATH
   echo "done."
     rm -rf .tmp_files
